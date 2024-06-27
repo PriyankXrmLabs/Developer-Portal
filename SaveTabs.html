@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dynamic Tabs</title>
+    <script src="https://res.cdn.office.net/teams-js/2.2.0/js/MicrosoftTeams.min.js"
+        integrity="sha384yBjE++eHeBPzIg+IKl9OHFqMbSdrzY2S/LW3qeitc5vqXewEYRWegByWzBN/chRh"
+        crossorigin="anonymous">
+    </script>
+</head>
+<body>
+    <h1>Custom Config Page</h1>
+
+    <script>
+        
+        microsoftTeams.app.initialize().then(() => {
+           
+            const tabsData = [
+                {
+                    "name": "Training ",
+                    "color": "Gray",
+                    "icon": "/images/iconGray.png",
+                    "websiteUrl": "https://xrmlabs.sharepoint.com/sites/PriyankTrainingSite",
+                    "contentUrl": "https://xrmlabs.sharepoint.com/sites/PriyankTrainingSite",
+                    "entityId": "grayIconTab",
+                    "suggestedDisplayName": "Training Tab"
+                },
+                {
+                    "name": "TestTab",
+                    "color": "Red",
+                    "icon": "/images/iconRed.png",
+                    "websiteUrl": "https://xrmlabs.sharepoint.com/sites/PriyankTrainingSite",
+                    "contentUrl": "https://xrmlabs.sharepoint.com/sites/PriyankTrainingSite",
+                    "entityId": "redIconTab",
+                    "suggestedDisplayName": "Test Tab"
+                }
+            ];
+
+            const saveTabConfig = (tab) => {
+                return new Promise((resolve, reject) => {
+                    microsoftTeams.pages.config.registerOnSaveHandler((saveEvent) => {
+                        const configPromise = microsoftTeams.pages.config.setConfig({
+                            websiteUrl: tab.websiteUrl,
+                            contentUrl: tab.contentUrl,
+                            entityId: tab.entityId,
+                            suggestedDisplayName: tab.suggestedDisplayName
+                        });
+                        configPromise
+                            .then(() => {
+                                saveEvent.notifySuccess();
+                                resolve();
+                            })
+                            .catch((error) => {
+                                saveEvent.notifyFailure("failure message");
+                                reject(error);
+                            });
+                    });
+                });
+            };
+
+            const saveAllTabs = async (tabs) => {
+                for (const tab of tabs) {
+                    try {
+                        document.getElementById('icon').src = tab.icon;
+                        await saveTabConfig(tab);
+                    } catch (error) {
+                        console.error('Error saving tab:', tab, error);
+                    }
+                }
+            };
+
+      
+            saveAllTabs(tabsData);
+        });
+    </script>
+</body>
+</html>
